@@ -1,13 +1,13 @@
 # Lab_Rep
 
-_¬ар≥ант_18_
+_Option_18_
 
 Python version : 3.7.3
 Used interpretaton : virtualenv
 ______________________________________________________________________________________________
 
-–озгортанн€ проекту :
-Х —клонувати з репозитор≥ю 
+Running the project :
+Х clone repository
   url : https://github.com/ViktoriaOhorilko/Lab_Rep
-Х ¬≥дкрити проект "flaskProject" (до прикладу в середовищ≥ PyCharm)
+Х Open projwct "flaskProject" (for example in PyCharm)
 Х "Run project" -> open url "http://127.0.0.1:5000/api/v1/hello-world-18" in browser
