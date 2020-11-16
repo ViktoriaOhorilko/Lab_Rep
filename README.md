@@ -2,12 +2,16 @@
 
 Option_18
 
-Python version : 3.7.3
-
-Used interpretaton : virtualenv
+*Python version : 3.7.3
+*Used interpretaton : virtualenv
 ______________________________________________________________________________________________
 
 Running the project :
+
+###Install Git to your computer
+*do it there: 'https://git-scm.com/downloads'
+
+###d
 • clone repository
   url : https://github.com/ViktoriaOhorilko/Lab_Rep
 • Open projwct "flaskProject" (for example in PyCharm)
