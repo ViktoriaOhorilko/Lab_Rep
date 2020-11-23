@@ -49,3 +49,16 @@ ________________________________________________________________________________
 * Run project
 * go to url `http://127.0.0.1:5000/api/v1/hello-world-18` in browser
 
+# Lab 2
+
+## Note Servise
+Option_2
+
+### To open swagger :
+
+* in terminal run commands:
+1. pip install flask_swagger_ui
+* build and run the project
+* go to url `http://http://127.0.0.1:5000/swagger/` in browser
+
+
