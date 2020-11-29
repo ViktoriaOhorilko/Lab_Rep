@@ -1,4 +1,5 @@
 # Lab1
+Ohorilko Viktoria
 
 Option_18
 
@@ -50,6 +51,7 @@ ________________________________________________________________________________
 * go to url `http://127.0.0.1:5000/api/v1/hello-world-18` in browser
 
 # Lab 2
+Ohorilko Viktoria
 
 ## Note Servise
 Option_2
