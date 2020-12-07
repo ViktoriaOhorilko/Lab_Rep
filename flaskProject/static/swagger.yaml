@@ -14,7 +14,7 @@ tags:
 - name: user
   description: Operations with user
 - name: edition
-  description: Note additions  
+  description: Note editions  
 - name: note
   description: Operations with note
 
