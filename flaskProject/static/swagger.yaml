@@ -5,7 +5,7 @@ info:
   title: "Notebook"
   contact:
     email: viktoriaohorilko@gmail.com
-
+    
 servers:
 - url: https://notes.io/api
 - url: http://notes.io/api
@@ -13,8 +13,8 @@ servers:
 tags:
 - name: user
   description: Operations with user
-- name: statistic
-  description: User statistic
+- name: edition
+  description: Note additions  
 - name: note
   description: Operations with note
 
@@ -22,7 +22,7 @@ tags:
 paths:
 
   /user:
-
+    
     post:
       tags:
       - user
@@ -33,7 +33,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/createuser'
+              $ref: '#/components/schemas/User'
         required: true
       responses:
         200:
@@ -46,10 +46,10 @@ paths:
           description: "Invalid input"
       security:
         - ApiKeyAuth: [ ]
-
-
+    
+        
   /user/log_in:
-
+    
     get:
       tags:
       - user
@@ -66,11 +66,11 @@ paths:
           description: "Log in crashed! Invalid login/password."
       security:
         - ApiKeyAuth: [ ]
-
-
-
+  
+  
+  
   /user/log_out:
-
+  
     get:
       tags:
       - user
@@ -84,40 +84,11 @@ paths:
           description: "Log out crashed!"
       security:
         - ApiKeyAuth: [ ]
-
-
-
+        
+        
+        
   /user/{user_id}:
-    get:
-      tags:
-      - user
-      summary: Get User by id
-      operationId: getUser
-      parameters:
-      - name: user_id
-        in: path
-        description: 'User ID'
-        required: true
-        schema:
-          type: integer
-      responses:
-        200:
-          description: Target user
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  oneOf:
-                    - $ref: '#/components/schemas/User'
-                    - $ref: '#/components/schemas/MessageStatistic'
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "User is not found"
-      security:
-        - ApiKeyAuth: [ ]
-
+        
     put:
       tags:
       - user
@@ -135,7 +106,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserUpdate'
+              $ref: '#/components/schemas/User'
         required: true
       responses:
         200:
@@ -148,7 +119,7 @@ paths:
           description: "Invalid ID supplied"
       security:
         - ApiKeyAuth: [ ]
-
+    
     delete:
       tags:
       - user
@@ -166,17 +137,14 @@ paths:
           description: "Invalid ID supplied"
       security:
       - ApiKeyAuth: [ ]
-
-
-
-
-  /statistic/{user_id}:
-
+      
+  /edition/{user_id}:
+  
     post:
       tags:
-      - statistic
-      summary: Add statistic
-      operationId: add_statistic
+      - edition
+      summary: Add edition
+      operationId: add_edition
       parameters:
       - name: user_id
         in: path
@@ -185,11 +153,11 @@ paths:
         schema:
           type: integer
       requestBody:
-        description: Add new statistic
+        description: Add new note edition
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessageStatistic'
+              $ref: '#/components/schemas/Edition'
         required: true
       responses:
         200:
@@ -198,18 +166,18 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  $ref: '#/components/schemas/MessageStatistic'
+                items: 
+                  $ref: '#/components/schemas/Edition'
         405:
           description: "Invalid input"
       security:
         - ApiKeyAuth: [ ]
-
+        
     get:
       tags:
-      - statistic
-      summary: Show statistic list
-      operationId: show_statistic
+      - edition
+      summary: Show edition
+      operationId: show_edition
       parameters:
       - name: user_id
         in: path
@@ -219,23 +187,23 @@ paths:
           type: integer
       responses:
         200:
-          description: Successful showed list
+          description: Successful showed edition
           content:
             application/json:
               schema:
                 type: array
-                items:
-                  $ref: '#/components/schemas/MessageStatistic'
+                items: 
+                  $ref: '#/components/schemas/Edition'
         405:
           description: "Operation crashed!"
       security:
         - ApiKeyAuth: [ ]
-
+  
     put:
       tags:
-      - statistic
-      summary: Edit statictic
-      operationId: editStatictic
+      - edition
+      summary: Edit edition
+      operationId: editEdition
       parameters:
       - name: user_id
         in: path
@@ -248,7 +216,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StatisticEdit'
+              $ref: '#/components/schemas/Edition'
         required: true
       responses:
         200:
@@ -261,11 +229,28 @@ paths:
           description: "Invalid ID supplied"
       security:
         - ApiKeyAuth: [ ]
-
-
-
+      
+        
+    delete:
+      tags:
+      - edition
+      summary: Delete edition
+      operationId: deleteEdition
+      parameters:
+      - name: user_id
+        in: path
+        description: 'Id of a target user'
+        required: true
+        schema:
+          type: integer
+      responses:
+        400:
+          description: "Invalid ID supplied"
+      security:
+      - ApiKeyAuth: [ ]    
+  
   /note/{user_id}:
-
+    
     post:
       tags:
       - note
@@ -291,44 +276,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  oneOf:
-                    - $ref: '#/components/schemas/Note'
-                    - $ref: '#/components/schemas/MessageStatistic'
+                $ref: '#/components/schemas/Note'
         405:
           description: "Invalid input"
       security:
         - ApiKeyAuth: [ ]
-
-    get:
-      tags:
-      - note
-      summary: Show note
-      operationId: show_note
-      parameters:
-      - name: user_id
-        in: path
-        description: 'User ID'
-        required: true
-        schema:
-          type: integer
-      responses:
-        200:
-          description: Successful showed note
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  oneOf:
-                    - $ref: '#/components/schemas/Note'
-                    - $ref: '#/components/schemas/MessageStatistic'
-        405:
-          description: "Operation crashed!"
-      security:
-        - ApiKeyAuth: [ ]
-
+        
+  
     put:
       tags:
       - note
@@ -346,7 +300,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteEdit'
+              $ref: '#/components/schemas/Note'
         required: true
       responses:
         200:
@@ -354,7 +308,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatusResponse'
+                type: array
+                items: 
+                  oneOf:
+                    - $ref: '#/components/schemas/Note'
+                    - $ref: '#/components/schemas/Edition'
         400:
           description: "Invalid ID supplied"
       security:
@@ -377,11 +335,10 @@ paths:
           description: "Invalid ID supplied"
       security:
       - ApiKeyAuth: [ ]
-
-
-
+      
+      
   /note/{tag}:
-
+  
     get:
       tags:
       - note
@@ -401,40 +358,25 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
+                items: 
                   oneOf:
                     - $ref: '#/components/schemas/Note'
-                    - $ref: '#/components/schemas/MessageStatistic'
+                    - $ref: '#/components/schemas/Edition'
         405:
           description: "Operation crashed!"
       security:
         - ApiKeyAuth: [ ]
-
-
-
-
+        
+        
 components:
   schemas:
-    createuser:
-      required:
-      - login
-      - password
-      - user_name
-      type: object
-      properties:
-        login:
-          type: string
-        password:
-          type: string
-        user_name:
-          type: string
-
+      
     User:
       required:
       - login
       - password
       - user_name
-      - id
+      - user_id
       type: object
       properties:
         login:
@@ -443,19 +385,43 @@ components:
           type: string
         user_name:
           type: string
-        id:
-          type: string
-
-    UserUpdate:
+        user_id:
+          type: integer
+          
+    Edition:
+      required:
+      - user_id
+      - note_id
+      - time_of_edition
+      - editet_text
       type: object
       properties:
-        login:
+        user_id:
+          type: integer
+        note_id:
+          type: integer
+        time_of_edition:
+          type: number
+        text:
           type: string
-        password:
+      
+    Note:
+      required:
+      - text
+      - tag
+      - user_id
+      - note_id
+      type: object
+      properties:
+        text:
           type: string
-        user_name:
-          type: string
-
+        tag:
+          type: string    
+        user_id:
+          type: string  
+        note_id:
+          type: integer
+          
     StatusResponse:
       required:
       - code
@@ -468,59 +434,7 @@ components:
         message:
           type: string
 
-    MessageStatistic:
-      required:
-      - note_id
-      - edit_history
-      - num_of_editions
-      type: object
-      properties:
-        note_id:
-          type: string
-        edit_history:
-          type: string
-        num_of_editions:
-          type: integer
-
-    StatisticEdit:
-      type: object
-      properties:
-        note_id:
-          type: string
-        edit_history:
-          type: string
-        num_of_editions:
-          type: integer
-
-    Note:
-      required:
-      - text
-      - list_of_available_editors
-      - author_id
-      - tag
-      type: object
-      properties:
-        text:
-          type: string
-        list_of_available_editors:
-          type: string
-        author_id:
-          type: string
-        tag:
-          type: string
-
-    NoteEdit:
-      type: object
-      properties:
-        text:
-          type: string
-        list_of_available_editors:
-          type: string
-        author_id:
-          type: string
-        tag:
-          type: string
-
+    
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
