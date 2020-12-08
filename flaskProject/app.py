@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask_script import Manager
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from gevent.pywsgi import WSGIServer
 
@@ -22,7 +21,7 @@ SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': "Seans-Python-Flask-REST-Boilerplate"
+      'app_name': "Seans-Python-Flask-REST-Boilerplate"
     }
 )
 app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
@@ -34,8 +33,9 @@ def hello_world():
 
 from Models.User_Model import User
 from Models.Note_Model import Note
-from Models.NoteStatistic_Model import NoteStatistic
 
 
-serv = WSGIServer(('127.0.0.1', 5000), app)
-serv.serve_forever()
+if __name__ == "__main__":
+    app.run()
+#serv = WSGIServer(('127.0.0.1', 5000), app)
+#serv.serve_forever()

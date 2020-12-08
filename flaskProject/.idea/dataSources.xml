@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="database" uuid="c5b67834-3779-468e-a4ac-c93ebb3d1dd3">
+    <data-source source="LOCAL" name="database" uuid="c535af22-48b7-4fec-848b-08a6f18cee85">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\git\lab 6\Lab_Rep\database.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:C:\git\lab 6\Lab_Rep\flaskProject\database.db</jdbc-url>
       <libraries>
         <library>
           <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.31.1/sqlite-jdbc-3.31.1.jar</url>
