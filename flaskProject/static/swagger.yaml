@@ -250,6 +250,32 @@ paths:
       - ApiKeyAuth: [ ]    
   
   /note/{user_id}:
+  
+    get:
+      tags:
+      - note
+      summary: Show nite
+      operationId: show_note
+      parameters:
+      - name: user_id
+        in: path
+        description: 'User ID'
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Successful showed note
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Note'
+        405:
+          description: "Operation crashed!"
+      security:
+        - ApiKeyAuth: [ ]
     
     post:
       tags:
@@ -282,6 +308,7 @@ paths:
       security:
         - ApiKeyAuth: [ ]
         
+  /note/{note_id}: 
   
     put:
       tags:
@@ -289,9 +316,9 @@ paths:
       summary: Edit note
       operationId: editNote
       parameters:
-      - name: user_id
+      - name: note_id
         in: path
-        description: 'Id of a target user'
+        description: 'Id of a target note'
         required: true
         schema:
           type: integer
@@ -324,9 +351,9 @@ paths:
       summary: Delete a note
       operationId: deleteNote
       parameters:
-      - name: user_id
+      - name: note_id
         in: path
-        description: 'Id of a target user'
+        description: 'Id of a target note'
         required: true
         schema:
           type: integer
@@ -401,7 +428,9 @@ components:
         note_id:
           type: integer
         time_of_edition:
-          type: number
+          type: string
+          format: date
+          example: "2021-01-30"
         text:
           type: string
       
