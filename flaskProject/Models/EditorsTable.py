@@ -1,8 +1,14 @@
 from db import db
 
-editors = db.Table('editor',
-                  db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-                  db.Column('note_id', db.Integer, db.ForeignKey('note.id')),
-                  db.Column('time of edition', db.DateTime, default=db.func.now()),
-                  db.Column('text', db.String(404), nullable=False)
-                  )
+
+class Editors(db.Model):
+
+    __tablename__ = "editor"
+
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    creator = db.relationship('User', backref='autor')
+    note_id = db.Column(db.Integer, db.ForeignKey('note.id'))
+    note_create = db.relationship('Note', backref='note')
+    time = db.Column(db.DateTime, default=db.func.now())
+    text = db.Column(db.String(404), nullable=False)
