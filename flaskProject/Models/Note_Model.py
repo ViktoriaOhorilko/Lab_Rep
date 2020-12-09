@@ -1,5 +1,7 @@
 from db import db
 from flask import jsonify
+from Models.User_Model import User
+from Models.EditorsTable import Editors
 
 class Note(db.Model):
     __tablename__ = "note"
@@ -25,10 +27,32 @@ class Note(db.Model):
         else:
             return jsonify({"message": "Error"}, 404)
 
-    def note_update(self, id=None):
-        if id:
-            update = Note.query.filter_by(id=id).first()
-            update.text = "YOUR NEW TEXT"
+    def read_by_user_id(self, user=None):
+        if user:
+            userid = Note.query.filter_by(author_id=user).all()
+            for i in userid:
+                print('Text of note:', i.text, '  find by user with id:', i.author_id, '  with tag:', i.tag)
+            return jsonify({"message": "Notes by user_id: "}, 200)
+        else:
+            return jsonify({"message": "Error"}, 404)
+
+    def note_update(self, note_data=None):
+        if note_data:
+            user_id = note_data.get('userid')
+            note_id = note_data.get('noteid')
+            readUser = User.query.filter_by(id=user_id).first()
+            readNote = Note.query.filter_by(id=note_id).first()
+            noteauthor = readNote.author_id
+            infobynoteid = Editors.query.filter_by(note_id=note_id).all()
+            #check if user id has access
+            if noteauthor!=user_id and user_id not in infobynoteid:
+                if len(infobynoteid) < 5:
+                    editor_object = Editors(readUser, readNote, "YOUR NEW TEXT")
+                    db.session.commit()
+                else:
+                    return jsonify({"message": "You havent access to edit: "}, 403)
+
+            readNote.text = "YOUR NEW TEXT"
             db.session.commit()
             return jsonify({"message": "Note was updated"}, 200)
         else:

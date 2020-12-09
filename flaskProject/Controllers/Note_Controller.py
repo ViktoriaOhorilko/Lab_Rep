@@ -26,11 +26,16 @@ class NoteController(object):
             db.session.commit()
             return jsonify({"message": "Note was created"}, 200)
 
+    #by tag
     def all_notes(self, tag=None):
         return self.model_note.read_by_tag(tag=tag)
 
-    def update_note(self, id=None):
-        return self.model_note.note_update(id=id)
+    #by user_id
+    def all_notes_by_user_id(self, user=None):
+        return self.model_note.read_by_user_id(user=user)
+
+    def update_note(self, note_data=None):
+        return self.model_note.note_update(note_data=note_data)
 
     def delete(self, id_of_n=None):
         return self.model_note.delete_note_from_db(id_of_n=id_of_n)
