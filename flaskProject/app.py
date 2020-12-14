@@ -1,7 +1,9 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify, make_response
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
+from werkzeug.security import check_password_hash
+from functools import wraps
 from gevent.pywsgi import WSGIServer
 from db import db
 from Models.User_Model import User
@@ -9,8 +11,12 @@ from Models.Note_Model import Note
 from Models.EditorsTable import Editors
 from Controllers.User_Controller import UserController
 from Controllers.Note_Controller import NoteController
+import datetime
+import jwt
+
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'my secret key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -38,6 +44,30 @@ def hello_world():
     return 'Hello World 18 !'
 
 
+def _token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token:
+            return jsonify({'message' : 'Token is missing!'}), 401
+
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            current_user = User.query.filter_by(id=data['id']).first()
+        except:
+            return jsonify({'message' : 'Token is invalid!'}), 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
+
+
+
 # link to try: http://127.0.0.1:5000/UserCreate?login=Sonia&password=1111&name=sonik
 # http://127.0.0.1:5000/UserCreate?login=Severyn&password=2111&name=shu
 # use POSTMAN post
@@ -49,34 +79,59 @@ def create_user():
         return user_controller.create(user_data)
 
 
+@app.route('/log_in')
+def login():
+    data=request.authorization
+
+    if not data or not data.username or not data.password:
+        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
+    user=User.query.filter_by(user_name=data.username).first()
+    if not user:
+        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
+    if check_password_hash(user.password, data.password):
+        token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
+            app.config['SECRET_KEY'])
+
+        return jsonify({'token': token.decode('UTF-8')})
+
+    return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
+
 # link to try: http://127.0.0.1:5000/UserUpdate?id=1
+
 @app.route('/UserUpdate', methods=['PUT'])
-def update_user():
-    idi = request.args.get('id')
+@_token_required
+def update_user(current_user):
+    data = request.args
     user_controller = UserController()
-    return user_controller.update(idi)
+    return user_controller.update(current_user.id, data)
 
 
 # link to try: http://127.0.0.1:5000/UserDelete?id=1
+
 @app.route('/UserDelete', methods=['DELETE'])
-def delete_user():
-    id_of_d = request.args.get('id')
+@_token_required
+def delete_user(current_user):
     user_controller = UserController()
-    return user_controller.delete(id_of_d)
+    return user_controller.delete(current_user.id)
 
 
 # link to try: http://127.0.0.1:5000/NoteCreate?text=BuyMilk&tag=purchase&login=Severyn
 @app.route('/NoteCreate', methods=['GET', 'POST'])
-def create_note():
+@_token_required
+def create_note(current_user):
     if request.method == 'POST':
         note_data = request.args
         note_controller = NoteController()
-        return note_controller.create(note_data)
+        return note_controller.create(note_data,current_user)
 
 
 # link to try: http://127.0.0.1:5000/NoteByTag?tag=purchase2
 @app.route('/NoteByTag', methods=['GET'])
-def notes_by_tag():
+@_token_required
+def notes_by_tag(current_user):
     tag_data = request.args.get('tag')
     note_controller = NoteController()
     read_notes = note_controller.all_notes(tag_data)
@@ -85,27 +140,36 @@ def notes_by_tag():
 
 # http://127.0.0.1:5000/NoteByUser?user=1
 @app.route('/NoteByUser', methods=['GET'])
-def notes_by_user():
-    note_data = request.args.get('user')
+@_token_required
+def notes_by_user(current_user):
     note_controller = NoteController()
-    read_notes = note_controller.all_notes_by_user_id(note_data)
+    read_notes = note_controller.all_notes_by_user_id(current_user.id)
     return read_notes
 
 
-# link to try: http://127.0.0.1:5000/NoteUpdate?userid=2&noteid=2
+# link to try: http://127.0.0.1:5000/NoteUpdate?&noteid=2
 @app.route('/NoteUpdate', methods=['PUT'])
-def update_notes():
+@_token_required
+def update_notes(current_user):
     note_data = request.args
     note_controller = NoteController()
-    return note_controller.update_note(note_data)
+    return note_controller.update_note(current_user.id, note_data)
 
 
 # link to try: http://127.0.0.1:5000/NoteDelete?id=1
 @app.route('/NoteDelete', methods=['DELETE'])
-def delete_note():
+@_token_required
+def delete_note(current_user):
     id_of_n = request.args.get('id')
     note_controller = NoteController()
-    return note_controller.delete(id_of_n)
+    return note_controller.delete(current_user.id,id_of_n)
+
+
+# link to try: http://127.0.0.1:5000/UserStatistic
+@app.route('/UserStatistic', methods=['GET'])
+@_token_required
+def user_statistic(current_user):
+    return Editors.read_user_editions(current_user.id)
 
 
 # serv = WSGIServer(('127.0.0.1', 5000), app)

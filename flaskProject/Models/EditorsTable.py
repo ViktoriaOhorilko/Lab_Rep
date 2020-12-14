@@ -1,3 +1,5 @@
+from flask import jsonify
+
 from db import db
 
 
@@ -18,3 +20,13 @@ class Editors(db.Model):
         self.note_create = note_create
         self.text = text
 
+    @classmethod
+    def read_user_editions(cls,user_id=None):
+        if user_id:
+            list_of_editions=[]
+            editions = Editors.query.filter_by(user_id=user_id).all()
+            for i in editions:
+                list_of_editions.append([i.note_id,i.time,i.text])
+            return jsonify( {"message": "User editions : "},list_of_editions, 200)
+        else:
+            return jsonify({"message": " Error "}, 404)
