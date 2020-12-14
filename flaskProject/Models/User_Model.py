@@ -1,6 +1,7 @@
 from db import db
 from flask import jsonify
 from marshmallow import Schema, fields, validate, ValidationError
+from werkzeug.security import generate_password_hash
 
 class User(db.Model):
 
@@ -30,6 +31,7 @@ class User(db.Model):
 
             new_password = update_data.get('new_password')
             if new_password:
+                new_password = generate_password_hash(new_password)
                 if User.query.filter_by(password=new_password).first() and update_user.password != new_password:
                     return jsonify({"message": "User with this data already exist"}, 404)
                 update_user.password = new_password

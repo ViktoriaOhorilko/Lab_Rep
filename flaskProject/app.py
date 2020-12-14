@@ -99,7 +99,7 @@ def login():
     return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
 
-# link to try: http://127.0.0.1:5000/UserUpdate?id=1
+# link to try: http://127.0.0.1:5000/UserUpdate?new_user_name
 
 @app.route('/UserUpdate', methods=['PUT'])
 @_token_required
@@ -109,7 +109,7 @@ def update_user(current_user):
     return user_controller.update(current_user.id, data)
 
 
-# link to try: http://127.0.0.1:5000/UserDelete?id=1
+# link to try: http://127.0.0.1:5000/UserDelete
 
 @app.route('/UserDelete', methods=['DELETE'])
 @_token_required
