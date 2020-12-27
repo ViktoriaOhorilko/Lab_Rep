@@ -72,3 +72,21 @@ Creating models for database
 * Creating models
 * Creating database and tables with all relationships
 * Creating migrations
+
+# Lab 4
+student: `Oleskevych Sofiia`
+
+## Realisation of API Documentation
+* Realisation CRUD for every table
+
+#Lab 5
+student: `Ohorilko Viktoriia`
+
+## Authorisation and authentification
+* Authorisation using JWT (JSON Web Token)
+
+#Lab 6
+student: `Pavlyk Bohdan`
+
+## Testing API
+* Writing tests using packets pytest and coverage

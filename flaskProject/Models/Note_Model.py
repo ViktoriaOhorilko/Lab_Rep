@@ -18,8 +18,9 @@ class Note(db.Model):
         self.tag = tag
         self.users = users
 
-    def read_by_tag(self, tag=None):
-        if tag:
+    def read_by_tag(self, tag1=None):
+        if tag1:
+            tag = tag1.get('tag')
             notes = Note.query.filter_by(tag=tag).all()
             list=[]
             for i in notes:
@@ -35,14 +36,12 @@ class Note(db.Model):
             for i in userid:
                 list.append([i.text, i.author_id, i.tag])
             return jsonify( {"message": "Notes by user_id: "},list, 200)
-        else:
-            return jsonify({"message": "Error"}, 404)
 
     def note_update(self, user_id=None, note_data=None):
         if note_data:
             note_id = note_data.get('note_id')
             note = Note.query.filter_by(id=note_id).first()
-            editor=User.query.filter_by(id=user_id).first()
+            editor = User.query.filter_by(id=user_id).first()
             #noteauthor = readNote.author_id
             editor_list = Editors.query.filter_by(note_id=note_id).all()
             different_editors_id=[]
@@ -66,7 +65,8 @@ class Note(db.Model):
     def delete_note_from_db(self, user_id=None, id_of_n=None):
         # delete note from db by his `id`
         if id_of_n:
-            delete_note = Note.query.get(id_of_n)
+            id = id_of_n.get('id')
+            delete_note = Note.query.filter_by(id=id).first()
             if user_id!=delete_note.author_id:
                 return jsonify({"message": "You don`t have access!"}, 403)
             db.session.delete(delete_note)

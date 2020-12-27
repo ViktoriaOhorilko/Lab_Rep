@@ -32,8 +32,8 @@ class User(db.Model):
             new_password = update_data.get('new_password')
             if new_password:
                 new_password = generate_password_hash(new_password)
-                if User.query.filter_by(password=new_password).first() and update_user.password != new_password:
-                    return jsonify({"message": "User with this data already exist"}, 404)
+                #if User.query.filter_by(password=new_password).first() and update_user.password != new_password:
+                #    return jsonify({"message": "User with this data already exist"}, 404)
                 update_user.password = new_password
 
             new_user_name = update_data.get('new_user_name')
@@ -44,8 +44,7 @@ class User(db.Model):
 
             db.session.commit()
             return jsonify({"message": "User was updated"}, 200)
-        else:
-            return jsonify({"message": "Invalid input"}, 404)
+
 
     def delete_from_db(self, id_of_d=None):
         # delete user from db by his `id`
@@ -54,8 +53,7 @@ class User(db.Model):
             db.session.delete(delete_user)
             db.session.commit()
             return jsonify({"message": "User was deleted"}, 200)
-        else:
-            return jsonify({"message": "User wasn`t deleted"}, 404)
+
 
 
 

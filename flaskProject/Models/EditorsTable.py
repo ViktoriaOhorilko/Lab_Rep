@@ -28,5 +28,3 @@ class Editors(db.Model):
             for i in editions:
                 list_of_editions.append([i.note_id,i.time,i.text])
             return jsonify( {"message": "User editions : "},list_of_editions, 200)
-        else:
-            return jsonify({"message": " Error "}, 404)

@@ -12,6 +12,7 @@ from Models.EditorsTable import Editors
 from Controllers.User_Controller import UserController
 from Controllers.Note_Controller import NoteController
 import datetime
+import pytest
 import jwt
 
 
@@ -22,6 +23,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 migrate = Migrate(app, db)
+
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
@@ -37,20 +39,28 @@ SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
 )
 app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
 
+def create_app():
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'my secret key'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# http://127.0.0.1:5000/api/v1/hello-world-18
-@app.route('/api/v1/hello-world-18')
-def hello_world():
-    return 'Hello World 18 !'
+    db.init_app(app)
+    migrate = Migrate(app, db)
 
+    manager = Manager(app)
+    manager.add_command('db', MigrateCommand)
+    return app
+
+test = app.test_client()
 
 def _token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
-
         if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
+
 
         if not token:
             return jsonify({'message' : 'Token is missing!'}), 401
@@ -60,6 +70,7 @@ def _token_required(f):
             current_user = User.query.filter_by(id=data['id']).first()
         except:
             return jsonify({'message' : 'Token is invalid!'}), 401
+
 
         return f(current_user, *args, **kwargs)
 
@@ -74,23 +85,23 @@ def _token_required(f):
 @app.route('/UserCreate', methods=['GET', 'POST'])
 def create_user():
     if request.method == 'POST':
-        user_data = request.args
+        user_data = request.get_json()
         user_controller = UserController()
         return user_controller.create(user_data)
 
 
 @app.route('/log_in')
 def login():
-    data=request.authorization
+    data=request.get_json()
 
-    if not data or not data.username or not data.password:
+    if not data or not data['username'] or not data['password']:
         return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
-    user=User.query.filter_by(user_name=data.username).first()
+    user=User.query.filter_by(user_name=data['username']).first()
     if not user:
         return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
-    if check_password_hash(user.password, data.password):
+    if check_password_hash(user.password, data['password']):
         token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
             app.config['SECRET_KEY'])
 
@@ -104,7 +115,7 @@ def login():
 @app.route('/UserUpdate', methods=['PUT'])
 @_token_required
 def update_user(current_user):
-    data = request.args
+    data = request.get_json()
     user_controller = UserController()
     return user_controller.update(current_user.id, data)
 
@@ -123,7 +134,7 @@ def delete_user(current_user):
 @_token_required
 def create_note(current_user):
     if request.method == 'POST':
-        note_data = request.args
+        note_data = request.get_json()
         note_controller = NoteController()
         return note_controller.create(note_data,current_user)
 
@@ -132,7 +143,7 @@ def create_note(current_user):
 @app.route('/NoteByTag', methods=['GET'])
 @_token_required
 def notes_by_tag(current_user):
-    tag_data = request.args.get('tag')
+    tag_data = request.get_json()
     note_controller = NoteController()
     read_notes = note_controller.all_notes(tag_data)
     return read_notes
@@ -151,7 +162,7 @@ def notes_by_user(current_user):
 @app.route('/NoteUpdate', methods=['PUT'])
 @_token_required
 def update_notes(current_user):
-    note_data = request.args
+    note_data = request.get_json()
     note_controller = NoteController()
     return note_controller.update_note(current_user.id, note_data)
 
@@ -160,9 +171,9 @@ def update_notes(current_user):
 @app.route('/NoteDelete', methods=['DELETE'])
 @_token_required
 def delete_note(current_user):
-    id_of_n = request.args.get('id')
+    id_of_n = request.get_json()
     note_controller = NoteController()
-    return note_controller.delete(current_user.id,id_of_n)
+    return note_controller.delete(current_user.id, id_of_n)
 
 
 # link to try: http://127.0.0.1:5000/UserStatistic

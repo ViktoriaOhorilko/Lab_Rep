@@ -16,8 +16,6 @@ class NoteController(object):
 
         if not self.model_note.text or not self.model_note.tag:
             return jsonify({"message": "Invalid input"}, 400)
-        elif creator is None:
-            return jsonify({"message": " dont know "}, 409)
         else:
             data = Note(self.model_note.text, self.model_note.tag, creator)
             db.session.add(data)
@@ -26,7 +24,7 @@ class NoteController(object):
 
     #by tag
     def all_notes(self, tag=None):
-        return self.model_note.read_by_tag(tag=tag)
+        return self.model_note.read_by_tag(tag1=tag)
 
     #by user_id
     def all_notes_by_user_id(self, user_id=None):
